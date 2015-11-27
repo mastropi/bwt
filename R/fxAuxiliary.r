@@ -9,7 +9,7 @@
 # Function that bounds an array to a given bound.
 bound = function(x, bound, type)
 ## Input parameters:
-## x:       Value to be bounded
+## x:       Vector of values to be bounded
 ## bound:   Value of the bound
 ## type:    Type of bound: MIN (upper bound), MAX (lower bound), BOTH (both lower and upper bound.
 ##          In this case, the bound is assumed to be positive)

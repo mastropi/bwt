@@ -37,19 +37,19 @@
 hyM = function(y, params, prior="normal")
 ## y:           Number or vector at which h(y) is evaluated.
 ## params:      Matrix having as many rows as the length of y and 3 columns,
-##				each equal, respectively, to the hyperparameter vectors p, sigma and tau
-##				appearing in the posterior distribution of theta
+##				      each equal, respectively, to the hyperparameter vectors p, sigma and tau
+##				      appearing in the posterior distribution of theta
 ##              (theta = mean of distribution of wavelet coefficients y).
 ##              The parameters are, in this order:
 ##              - p:           Probability of deltaDirac(theta) function in normal mixture model for corresponding scale j
 ##              - sigma:       Value of standard deviation of noise for corresponding scale j
 ##              - tau:         Value of standard deviation of the prior for theta for the corresponding scale j
-##				In general sigma will be a constant for all scales.
-## prior:		Name of the distribution function used as prior for theta.
+##				      In general sigma will be a constant for all scales.
+## prior:		    Name of the distribution function used as prior for theta.
 ##              Possible values: "normal", "laplacian"
 {
 	hy = NULL
-	
+
 	if (prior == "laplacian")
 	{
 		# Parse parameters of posterior distribution used in the calculation of h(y)
@@ -58,10 +58,10 @@ hyM = function(y, params, prior="normal")
 		ysigma = y/sigma;
 		sigmatau = sigma/tau;
 		ytau = y/tau;
-		
+
 		hy = exp(ytau + log(pnorm(-ysigma-sigmatau))) + exp(-ytau + log(pnorm(ysigma-sigmatau)));
 	}
-	
+
 	return(hy)
 }
 
@@ -70,18 +70,18 @@ fyM = function(y, params, prior="normal", hy=NULL)
 ## y:           See definition given in function hyM().
 ## params:      See definition given in function hyM().
 ## prior:       See definition given in function hyM().
-## hy:			When parameter prior = "laplacian", this is a number or vector the
-##				same dimension as y containing the pdf normalizing function defined as h(y)
-##				in the paper as the denominator of g(x/y)
-##				Otherwise use NULL.
-##				Default: NULL
+## hy:			    When parameter prior = "laplacian", this is a number or vector the
+##				      same dimension as y containing the pdf normalizing function defined as h(y)
+##				      in the paper as the denominator of g(x/y)
+##				      Otherwise use NULL.
+##				      Default: NULL
 {
 	# Parse parameters of posterior distribution
 	p = params[,1];
 	sigma = params[,2];
 	tau = params[,3];
 	sigmatau = sigma/tau;
-	
+
 	if (prior == "normal")
 	{
 		a = 1/(1 + sigmatau^2);
@@ -92,7 +92,7 @@ fyM = function(y, params, prior="normal", hy=NULL)
 		fmarginal = (1-p)*dnorm(y, sd=sigma) + 0.5*p/tau*exp(0.5*sigmatau^2)*hy;
 		## Note that dnorm(y, sd=sigma) is equivalent to 1/sigma * dnorm(y/sigma) which is what is written in our paper.
 	}
-	
+
 	return(fmarginal)
 }
 ######################################## FMARGINAL ############################################
@@ -127,7 +127,7 @@ loglike_adaptive <- function(theta, y, prior="normal", fixed.values=c(0.5, 1))
 		alpha = fixed.values[1];
 		beta = fixed.values[2];
 	}
-	
+
 	logL = 0;
 	for (j in 0:(y$nlevels-1))
 	{
@@ -137,7 +137,7 @@ loglike_adaptive <- function(theta, y, prior="normal", fixed.values=c(0.5, 1))
 		hyj = hy(yj, c(pj, sigma, tauj), prior=prior)
 		logL = logL + sum(log(fmarginal(yj, c(pj, sigma, tauj), prior, hyj)))
 	}
-	
+
 	return(-logL)   # The minus sign is used because the function is minimized, not maximized (with optim()).
 }
 ################################## MARGINAL LOGLIKELIHOOD #####################################
@@ -151,12 +151,12 @@ map_params = function(theta)
 	p = 1/(1+exp(-theta[1]))
 	sigma = exp(theta[2])
 	tau = exp(theta[3])
-	
+
 	params = vector("numeric", length=3);
 	params[1] = p;
 	params[2] = sigma;
 	params[3] = tau;
-	
+
 	return(params)
 }
 
@@ -176,12 +176,12 @@ params_estimate = function(y, params=NULL, prior="normal", adaptive=FALSE, fixed
 ## fixed.values:    2-D vector with the fixed values to be used for the parameters alpha and beta in the ADAPTIVE framework.
 {
 	cat("Fitting parameters of posterior distribution of theta (p, sigma, tau)...\n")
-	
+
 	# Create the vector containing the wavelet coefficients
 	# First eliminate the character elements present in y (o.w. yD takes character values)
 	y$wf = NULL;
 	yD = as.vector(unlist(y)[1:(y$N-1)])
-	
+
 	if (!is.null(params))
 	{
 		sigma0 = params$sigma;
@@ -229,7 +229,7 @@ params_estimate = function(y, params=NULL, prior="normal", adaptive=FALSE, fixed
 			beta0 = fixed.values[2];
 			fit = optim(c(log(sigma0), log(C10), log(C20), log(alpha0), log(beta0)), loglike_adaptive, y=y, prior=prior)
 		}
-		
+
 		# Parameter estimates obtained
 		params <- exp(fit$par)
 		sigma = params[1]
@@ -252,7 +252,7 @@ params_estimate = function(y, params=NULL, prior="normal", adaptive=FALSE, fixed
 		}
 	}
 	params = list(sigma=sigma, tau=tau, p=p);
-	
+
 	return(params)
 }
 ################################## PARAMETER ESTIMATES ########################################
@@ -274,11 +274,11 @@ kill = function(y, params, prior="normal")
 	ysigma = y/sigma;
 	sigmatau = sigma/tau;
 	sigma2tau = sigma^2/tau;
-	
+
 	# Evaluation of the marginal pdf
 	hy = hy(y, params, prior);
 	fy = fmarginal(y, params, prior, hy);
-	
+
 	if (prior == "normal")
 	{
 		a = 1/(1 + sigmatau^2)
@@ -296,7 +296,7 @@ kill = function(y, params, prior="normal")
 		py = 0.5*p/tau * hy * exp(0.5*sigma2tau^2) / fy;
 		Gy0 = exp(y/tau)/hy * pnorm(-(y + sigma2tau)/sigma);
 	}
-	
+
 	enter = vector("numeric", length=length(y));
 	theta_hat = vector("numeric", length=length(y));
 	for (i in 1:length(y))
@@ -341,7 +341,7 @@ kill = function(y, params, prior="normal")
 			}
 		}
 	}
-	
+
 	return(theta_hat)
 }
 ############################### KILL WAVELET COMPONENTS #######################################
@@ -371,10 +371,10 @@ posterior_median = function(y, params, prior="normal", adaptive=FALSE)
 	sigma = params$sigma;
 	tau = params$tau;
 	p = params$p;
-	
+
 	# Initialize theta_hat as a dwt object
 	theta_hat = y;
-	
+
 	# Eliminate element wf which has a character value before unlisting y because o.w. the result
 	# obtained by the unlisting is not numeric.
 	y$wf = NULL;
@@ -408,7 +408,7 @@ posterior_median = function(y, params, prior="normal", adaptive=FALSE)
 			theta_hat[[y$nlevels-j]] = theta_hat_j;
 		}
 	}
-	
+
 	return(theta_hat)
 }
 ##################################### POSTERIOR MEDIAN ########################################

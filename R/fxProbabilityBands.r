@@ -12,7 +12,7 @@
 # cgf
 # cgf_der
 # cgf_der2
-# 
+#
 # WAVELET FUNCTIONS
 # wavelet_functions
 #
@@ -112,7 +112,7 @@ cgf = function(u, y, params, prior="normal")
 	tau = params[3];
 	ysigma = y/sigma;
 	sigmatau = sigma/tau;
-	
+
 	# Quantities required for the computation of the cumulant generating function
 	if (prior == "normal")
 	{
@@ -139,7 +139,7 @@ cgf = function(u, y, params, prior="normal")
 		#py = 0.5*p/tau * hy * exp(0.5*sigmatau^2)/fy;
 		py = min(exp( log(0.5*p/tau) + log(hy) - log(fy) + 0.5*sigmatau^2 ), 1);	# min() AVOIDS having py > 1!
 		# DM-2011/08/31-END
-		
+
 		# DM-2011/08/27-START: Replaced the ratio py/hy by the expression above which is equal to py/hy
 		# The reason is: be able to bound the ratio by MAXDOUBLE, which is not possible when doing py/hy
 		# because NaN may be produced (i.e. not only Inf), and min(MAXDOUBLE,NaN) = NaN (and not MAXDOUBLE).
@@ -154,7 +154,7 @@ cgf = function(u, y, params, prior="normal")
 		y1u = -(ysigma + sigmatau*(1+u*tau));
 		y2u = -(ysigma - sigmatau*(1-u*tau));
 	}
-	
+
 	# Cumulant generating function
 	# NOTE: (2011/08/28) In order to avoid overflow of the exponentials present in the cgf, K(u)
 	# (such as exp[(sigma*u)^2] and exp(y*u)), I divide the vector u into 2 pieces:
@@ -177,7 +177,7 @@ cgf = function(u, y, params, prior="normal")
 		indpos = which(u<=0);
 		indneg = which(u>0);
 	}
-	
+
 	if (prior == "normal")
 	{
 		cgf[indpos] = bound( (a*y*u[indpos] + 0.5*(b*u[indpos])^2) + log( bound( (1-py)*exp(-(a*y*u[indpos] + 0.5*(b*u[indpos])^2)) + py, MINDOUBLE, "max" ) ), MAXDOUBLE, "min" );
@@ -189,7 +189,7 @@ cgf = function(u, y, params, prior="normal")
 		cgf[indpos] = 0.5*(sigma*u[indpos])^2 + y*u[indpos] + log( (1-py)*exp(-0.5*(sigma*u[indpos])^2 - y*u[indpos]) + consty*B(u[indpos], y, sigma, tau, y1u[indpos], y2u[indpos]) );
 		cgf[indneg] = 0.5*(sigma*u[indneg])^2 + log( (1-py)*exp(-0.5*(sigma*u[indneg])^2) + consty*exp(y*u[indneg])*B(u[indneg], y, sigma, tau, y1u[indneg], y2u[indneg]) );
 	}
-	
+
 	return(cgf)
 }
 
@@ -213,7 +213,7 @@ cgf_der = function(u, y, params, prior="normal")
 	tau = params[3];
 	ysigma = y/sigma;
 	sigmatau = sigma/tau;
-	
+
 	# Quantities required for the computation of the cumulant generating function
 	if (prior == "normal")
 	{
@@ -238,7 +238,7 @@ cgf_der = function(u, y, params, prior="normal")
 #        py = 0.5*p/tau * hy * exp(0.5*sigmatau^2)/fy;
 		py = min(exp( log(0.5*p/tau) + log(hy) - log(fy) + 0.5*sigmatau^2 ), 1);	# min() AVOIDS having py > 1!
 		# DM-2011/11/05-END
-		
+
 		# DM-2011/11/05-START: Did the same change I did in cgf() function
 #        consty = py/hy;
 		consty = apply(cbind(MAXDOUBLE, exp(log(0.5*p/tau) - log(fy) + 0.5*sigmatau^2)), 1, min);
@@ -246,7 +246,7 @@ cgf_der = function(u, y, params, prior="normal")
 		y1u = -(ysigma + sigmatau*(1+u*tau));
 		y2u = -(ysigma - sigmatau*(1-u*tau));
 	}
-	
+
 	# Derivative of the cumulant generating function
 	cgf_der = u*0;  # This is to initialize the object CGF with the same size and type of u (either a matrix or a vector)
 	# In this way I don't need to worry about checking whether u is a vector or a matrix.
@@ -271,7 +271,7 @@ cgf_der = function(u, y, params, prior="normal")
 		cgf_der[indpos] = consty * ( B(u[indpos], y, sigma, tau, y1u[indpos], y2u[indpos])*(y + sigma^2*u[indpos]) + B_der(u[indpos], y, sigma, tau, y1u[indpos], y2u[indpos]) ) / ( (1-py)*exp(-0.5*(sigma*u[indpos])^2 - y*u[indpos]) + consty*B(u[indpos], y, sigma, tau, y1u[indpos], y2u[indpos]) )
 		cgf_der[indneg] = consty * exp(y*u[indneg]) * ( B(u[indneg], y, sigma, tau, y1u[indneg], y2u[indneg])*(y + sigma^2*u[indneg]) + B_der(u[indneg], y, sigma, tau, y1u[indneg], y2u[indneg]) ) / ( (1-py)*exp(-0.5*(sigma*u[indneg])^2) + consty*exp(y*u[indneg])*B(u[indneg], y, sigma, tau, y1u[indneg], y2u[indneg]) );
 	}
-	
+
 	return(cgf_der)
 }
 
@@ -297,7 +297,7 @@ cgf_der2 = function(u, y, params, K_der, prior="normal")
 	tau = params[3];
 	ysigma = y/sigma;
 	sigmatau = sigma/tau;
-	
+
 	# Quantities required for the computation of the cumulant generating function
 	if (prior == "normal")
 	{
@@ -322,7 +322,7 @@ cgf_der2 = function(u, y, params, K_der, prior="normal")
 #        py = 0.5*p/tau * hy * exp(0.5*sigmatau^2)/fy;
 		py = min(exp( log(0.5*p/tau) + log(hy) - log(fy) + 0.5*sigmatau^2 ), 1);	# min() AVOIDS having py > 1!
 		# DM-2011/11/05-END
-		
+
 		# DM-2011/11/05-START: Did the same change I did in cgf() function
 #        consty = py/hy;
 		consty = apply(cbind(MAXDOUBLE, exp(log(0.5*p/tau) - log(fy) + 0.5*sigmatau^2)), 1, min);
@@ -330,7 +330,7 @@ cgf_der2 = function(u, y, params, K_der, prior="normal")
 		y1u = -(ysigma + sigmatau*(1+u*tau));
 		y2u = -(ysigma - sigmatau*(1-u*tau));
 	}
-	
+
 	# Second derivative of cumulant generating function
 	cgf_der2 = u*0; # This is to initialize the object CGF with the same size and type of u (either a matrix or a vector)
 	# In this way I don't need to worry about checking whether u is a vector or a matrix.
@@ -354,7 +354,7 @@ cgf_der2 = function(u, y, params, K_der, prior="normal")
 		cgf_der2[indpos] = K_der[indpos]*(y + sigma^2*u[indpos] - K_der[indpos]) + consty * ( sigma^2*B(u[indpos], y, sigma, tau, y1u[indpos], y2u[indpos]) + (y + sigma^2*u[indpos])*B_der(u[indpos], y, sigma, tau, y1u[indpos], y2u[indpos]) + B_der2(u[indpos], y, sigma, tau, y1u[indpos], y2u[indpos]) ) / ( (1-py)*exp(-0.5*(sigma*u[indpos])^2 - y*u[indpos]) + consty*B(u[indpos], y, sigma, tau, y1u[indpos], y2u[indpos]) )
 		cgf_der2[indneg] = K_der[indneg]*(y + sigma^2*u[indneg] - K_der[indneg]) + consty * exp(y*u[indneg]) * ( sigma^2*B(u[indneg], y, sigma, tau, y1u[indneg], y2u[indneg]) + (y + sigma^2*u[indneg])*B_der(u[indneg], y, sigma, tau, y1u[indneg], y2u[indneg]) + B_der2(u[indneg], y, sigma, tau, y1u[indneg], y2u[indneg]) ) / ( (1-py)*exp(-0.5*(sigma*u[indneg])^2) + consty*exp(y*u[indneg])*B(u[indneg], y, sigma, tau, y1u[indneg], y2u[indneg]) );
 	}
-	
+
 	return(cgf_der2)
 }
 ################################## CUMULANT GENERATING FUNCTION ###############################
@@ -384,7 +384,7 @@ wavelet_functions = function(N, nlevels, wf)
 {
 	# Initialize a dwt object with all coefficients equal to 0.
 	theta = dwt(rep(0, N), wf=wf, n.levels=nlevels, boundary="periodic");
-	
+
 	# Put a 1 on each position of detail coefficients and reconstruct the signal corresponding to that
 	# distribution of coefficients (which gives the desired wavelet function).
 	psi = matrix(0, nrow=N, ncol=N-1);
@@ -401,7 +401,7 @@ wavelet_functions = function(N, nlevels, wf)
 			theta[[nlevels-j]][k+1] = 0;
 		}
 	}
-	
+
 	return(psi)
 }
 ###################################### WAVELET FUNCTIONS ######################################
@@ -430,7 +430,7 @@ urange = function(umax, ustep, prior, margin=10)
 		ulast = which(abs(u-umax)<1E-6);    # This is tantamount to finding the indices where u = umax
 		uind = ufirst:ulast;
 	}
-	
+
 	list(u=u, uind=uind);
 }
 ###################################### RANGE OF U #############################################
@@ -438,7 +438,7 @@ urange = function(umax, ustep, prior, margin=10)
 
 #################################### PROBABILITY BANDS ########################################
 # Computes the probability bands for the true signal
-prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.points=20)
+prob_bands_slow = function(y, params, prior="normal", max.length=512, margin=20, nro.points=20)
 ## y:               A dwt object containing the wavelet coefficients plus the following additional attributes:
 ##                  $N:         The length of the original signal.
 ##                  $nlevels:   The number of levels of the wavelet decomposition
@@ -470,7 +470,7 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 	{
 		spline.fit = FALSE;
 	}
-	
+
 	# Wavelet functions
 	cat("Computing the confidence bands of the signal...\n")
 	if (spline.fit) {
@@ -481,20 +481,20 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 	}
 	cat("\tWavelet functions...\n")
 	psi = wavelet_functions(y$N, y$nlevels, y$wf);
-	
+
 	##### DELETE ######
 #    # For each time ti, which (j,k) have Psi(j,k)(ti) equal to 0.
 #    ind0 = which(psi==0, arr.ind=TRUE);
 #    # Indices where the wavelet is not 0.
 #    indnot0 = which(psi!=0, arr.ind=TRUE);
-	
+
 #    indnot0 = matrix(FALSE, nrow=y$N, ncol=ncol(psi))
 #    for (i in 1:y$N)
 #    {
 #        indnot0[i,] = psi[i,] != 0;
 #    }
 	##### DELETE ######
-	
+
 	### Determine the range of u for which K(u) is computed.
 	K_der2_0 = rep(0, y$N);
 	for (j in 0:(y$nlevels-1))
@@ -513,7 +513,7 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 			K_der2_0[indnot0] = K_der2_0[indnot0] + psi[indnot0,2^j+k]^2 * Kjk_der2_0;
 		}
 	}
-	
+
 	# Range for u
 	# These are the points where the cumulant generating function K(u) and its first and second derivatives are evaluated
 	# for the computation of the probability bands.
@@ -530,7 +530,7 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 		nro.points = 20;
 	}
 	ustep = 2*umax/ceiling(nro.points);
-	
+
 	# DM-2013/06/04-START: Moved the computation of vector u from the beginning of the FOR i loop below to here
 	# as for the matrix implementation we need a single u vector for all y values (i.e. all i indices)
 	# (in V12b version, the u vector was computed for each i using the umax value computed above for that i)
@@ -542,7 +542,7 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 	u = uext[uind];
 	print(uext)
 	# DM-2013/06/04-END
-	
+
 	### Cumulant generating function
 	# Initializing the matrices that will contain the median, and the lower and upper probability limits.
 	x_hat_med = vector("numeric", length=y$N);
@@ -550,7 +550,7 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 	x_hat_upp = as.data.frame(matrix(nrow=y$N, ncol=3));
 	colnames(x_hat_low) = c("005", "025", "050");
 	colnames(x_hat_upp) = c("950", "975", "995");
-	
+
 	# Construct yvec so that the wavelet coefficients are accessed directly through a linear index which grows as 2^j+k,
 	# as is the case with columns in psi.
 	yvec = NULL;
@@ -558,15 +558,15 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 	{
 		yvec = c(yvec, y[[y$nlevels-j]])
 	}
-	
+
 	# DM-2013/06/04-TEMP: Create matrix gK and its derivatives (g stands for 'global') in the global environment in order to store the values of K for all i's and u's
 	# and compare with their values with the results from the matrix implementation started in Jan-2012 (see tasks.txt and test_ImplementationMatrixOperationsAllCases.r)
-	# Note that the number of columns of gK* is given by the length of u (not uext which is the length of K above) 
+	# Note that the number of columns of gK* is given by the length of u (not uext which is the length of K above)
 	# which defines the actual range of u where the K(u) is evaluated (to avoid the border effects in the Laplacian prior case)
 	gK <<- matrix(data=0, nrow=y$N, ncol=length(u))
 	gK_der <<- matrix(data=0, nrow=y$N, ncol=length(u))
 	gK_der2 <<- matrix(data=0, nrow=y$N, ncol=length(u))
-	
+
 	cat("\tCumulant generating function and its derivatives...\n")
 # Counter of wrong cases with u*K'(u) - K(u) < 0 and of K"(u) < 0, which should NOT happen
 	wrong_count = 0
@@ -588,19 +588,19 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 		K = rep(0, length(uext));
 		K_der = rep(0, length(uext));
 		K_der2 = rep(0, length(uext));
-		
+
 		for (l in indnot0)		# l is the index that puts together both scale j and shift k into one signle index, representing the columns of the wavelet functions psi.
 		{
 			j = floor(log2(l));
 			k = l - 2^j;
 			yjk = yvec[l];
 #            cat("\tl=", l, "j=", j, "k=", k, "\n")
-			
+
 			# Cumulant
 			Kjk = cgf(psi[i,l]*uext, yjk, params=c(p[j+1], sigma, tau[j+1]), prior=prior);
 			# Completing the matrix cgfjk with the cases when psi = 0.
 			K = K + Kjk;
-			
+
 			# First and second derivative of cumulant
 			if (!spline.fit)
 			{
@@ -635,14 +635,14 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 			# Estimate seconde derivative K_der2
 			K_der2_pred = predict(K_der_spline, uext, deriv=1);
 			K_der2 = K_der2_pred$y;
-			
+
 			# Restrict the values of uext to the useful range given by u which avoids inconsistent values in K_der and K_der2.
 			u = uext[uind]
 			K = K[uind];
 			K_der = K_der[uind];
 			K_der2 = K_der2[uind];
 		}
-		
+
 #print(cbind(u,K))
 #if (!(j == 6 && k == 3 && l == 67 && i == 1)) {
 		# Store variables in the Global Environment for debugging (could also use the <<- operator)
@@ -660,15 +660,15 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 		assign("j", j, envir=.GlobalEnv)
 		assign("k", k, envir=.GlobalEnv)
 		assign("l", l, envir=.GlobalEnv)
-		
+
 		# DM-2013/06/04-TEMP: Update the matrices K, K_der and K_der2
 		gK[i,] <<- K
 		gK_der[i,] <<- K_der
 		gK_der2[i,] <<- K_der2
 #}
-		
+
 #keypressed = readline("********** Press ENTER to continue **********")
-		
+
 # Check whether the saddlepoint approximation can be computed without error, and the number of cases where
 # v1 = 0, which prevents the computation of the variable r which is ~ 1/v1.
 		wrong = vector(length=nrow(psi), "numeric");
@@ -701,7 +701,7 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 		v2 = u*sqrt( bound(K_der2, 0, "max") );
 		r = v1 + 1/v1 * log(v2/v1);
 		Fu = pnorm(r);     # There are as many NA's as the length of the signal which correspond to the cases u = 0.
-		
+
 		### Computing the lower and upper bounds of the CI for the signal
 		### The method is based on the prediction of the quantiles -1.96, 0 and 1.96 given by a smoothing spline
 		### fitted to the points (r(u), K'(u)).
@@ -731,7 +731,7 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 			q1 = -2.575829;		# quantile 0.005
 			q2 = -1.959964;		# quantile 0.025
 			q3 = -1.644854;		# quantile 0.05
-			q4 = 0;				# quantile 0.5
+			q4 = 0;				    # quantile 0.5
 			q5 = 1.644854;		# quantile 0.95
 			q6 = 1.959964;		# quantile 0.975
 			q7 = 2.575829;		# quantile 0.995
@@ -745,15 +745,328 @@ prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.
 			x_hat_upp[i, "995"] = quantiles$y[7]
 		}
 	} # for i
-	
+
 # Show the number of wrong cases (at most as many as time indices there are: N)
 	cat("Number of cases with u*K'(u) - K(u) < 0:", wrong_count, ", smaller value:", wrong_min_value, "Summary:\n")
 	print(summary(wrong_values))
 	cat("Number of cases with K\"(u) < 0:", K_der2_neg_count, ", smaller value:", K_der2_min_value, "Summary: \n")
 	print(summary(K_der2_neg_values))
-	
+
 #    list(x_hat_low=x_hat_low, x_hat_med=x_hat_med, x_hat_upp=x_hat_upp)
 	list(x_hat_low=x_hat_low, x_hat_med=x_hat_med, x_hat_upp=x_hat_upp, u=u, r=r, Fu=Fu, K=K, K_der=K_der, K_der2=K_der2)
+}
+
+
+prob_bands = function(y, params, prior="normal", max.length=512, margin=20, nro.points=20)
+## y:               A dwt object containing the wavelet coefficients plus the following additional attributes:
+##                  $N:         The length of the original signal.
+##                  $nlevels:   The number of levels of the wavelet decomposition
+##                  $wf:        The value of parameter wf used in the dwt() function that was used to compute the wavelet coefficients.
+## params:          A list containing the estimated hyperparameters (sigma, tau, p) at each level of decomposition.
+##                  $sigma:     Single number with the estimated value of the noise standard deviation
+##                  $tau:       Vector of length y$nlevels, with the estimated value of the scale parameter of
+##                              the wavelet coefficient's prior at each level of decomposition.
+##                  $p:         Vector of length y$nlevels, with the estimated value of the mixture probability
+##                              at each level of decomposition.
+## prior:           Prior considered for theta ("normal", "laplacian")
+## max.length:      See documentation for bwt()
+## margin:          See documentation for bwt()
+## nro.points:      See documentation for bwt()
+##
+## RETURNED VALUES
+## A list with the following elements:
+## x_hat_low: a matrix of size y$N x 3, each column containing the lower bound for the 90%, 95% and 99% Probability Band
+## x_hat_med: a vector of length y$N with the estimated signal
+## x_hat_upp: same as x_hat_low but for the upper bound.
+{
+  ### Parse input parameters
+  # Parameter estimates
+  sigma = params$sigma;
+  tau = params$tau;
+  p = params$p;
+  # Define whether a spline should be fit to K(u) in order to estimate K_der and K_der2.
+  spline.fit = TRUE;
+  if (prior == "normal" | y$N <= max.length)
+  {
+    spline.fit = FALSE;
+  }
+  ####### TEMP: (2015/11/05) K_der and K_der2 are currently computed only using a spline fit.
+  spline.fit = TRUE
+  ####### TEMP: (2015/11/05) K_der and K_der2 are currently computed only using a spline fit.
+
+  # Wavelet functions
+  cat("Computing the confidence bands of the signal...\n")
+  if (spline.fit) {
+    cat("Using spline fit for the derivatives of the cumulant generating function, K(u)\n")
+  }
+  else {
+    cat("WITH NO spline interpolation for the derivatives of K(u)\n")
+  }
+  cat("\tWavelet functions...\n")
+  psi = wavelet_functions(y$N, y$nlevels, y$wf);
+
+  ### Determine the range of u for which K(u) is computed.
+  K_der2_0 = rep(0, y$N);
+  for (j in 0:(y$nlevels-1))
+  {
+    for (k in 0:(2^j-1))
+    {
+      # Time indices where the wavelet function is non-zero.
+      # Contributions to K"(u) come only from time points where the wavelet function psi(j,k,t) is not zero as the square
+      # of psi is multiplying each term of the summation expression giving K"(u) (see paper p.485).
+      indnot0 = which(psi[,2^j+k]!=0);	# Recall that each row is a time point, so this selects all the TIME points where psi(j,k,t) is NOT zero.
+      # Value of y(j,k)
+      yjk = y[[y$nlevels-j]][k+1];
+      # The following are NUMBERS (not vectors).
+      Kjk_der_0 = cgf_der(0, yjk, c(p[j+1], sigma, tau[j+1]), prior="normal");
+      Kjk_der2_0 = cgf_der2(0, yjk, c(p[j+1], sigma, tau[j+1]), Kjk_der_0, prior="normal");
+      K_der2_0[indnot0] = K_der2_0[indnot0] + psi[indnot0,2^j+k]^2 * Kjk_der2_0;
+    }
+  }
+
+  # Range for u
+  # These are the points where the cumulant generating function K(u) and its first and second derivatives are evaluated
+  # for the computation of the probability bands.
+  # Note that there is a difference between the normal prior case and the laplacian prior case, because in the latter, the
+  # derivatives of K(u) are computed via an estimation based on the smoothing spline fit to K(u) and there are border effects
+  # that are avoided as much as possible by extending the range of computation of K(u).
+  # DM-2013/06/04: Added the MAX() function in the computation of umax in order to have one single u vector in order to carry out the matrix implementation
+  # which requires a KM matrix where the rows represent the y axis and the columns represent the u axis, whose points have to be the same
+  # for all y values (i.e. all i indices).
+  umax = max(round(3.5/sqrt(K_der2_0)))    # The round() function is to have always u=0 as one of the evaluating points and thus avoid problems in Fu
+  # when u is very close to 0 generating the possibility of v1 and v2 not being exactly 0 when they should be.
+  if (nro.points < 10)
+  {
+    nro.points = 20;
+  }
+  ustep = 2*umax/ceiling(nro.points);
+
+  # DM-2013/06/04-START: Moved the computation of vector u from the beginning of the FOR i loop below to here
+  # as for the matrix implementation we need a single u vector for all y values (i.e. all i indices)
+  # (in V12b version, the u vector was computed for each i using the umax value computed above for that i)
+  # In addition I renamed u with uext in order to avoid overwriting u inside the i loop which messed everything
+  # up, and because it is more convenient to call the actual u values as u and not as usubset (for instance).
+  UVar = urange(umax, ustep, prior, margin);
+  uext = UVar$u;
+  uind = UVar$uind;
+  u = uext[uind];
+  #print(uext)
+  # DM-2013/06/04-END
+
+  # Construct yvec so that the wavelet coefficients are accessed directly through a linear index
+  # which grows as 2^j+k, as is the case with columns in psi.
+  yvec = NULL;
+  for (j in 0:(y$nlevels-1)) {
+    yvec = c(yvec, y[[y$nlevels-j]])
+  }
+
+  ### In what follows I will use:
+  ### - the V suffix to indicate that the variable is a VECTOR
+  ### - the M suffix to indicate that the variable is a MATRIX
+  ### IMPORTANT NOTE ABOUT COMPUTATIONS CARRIED OUT BELOW:
+  ### In some cases there are multiplications between a vector and a matrix (e.g. v [Lx1] * M [LxU]) in which case the product is done columnwise,
+  ### that is v multiplies the first column of M, then the second column of M and so forth. And this is what we want (based on the original computations
+  ### for this section done in version bwtV12b.r)
+  ny = length(yvec)
+  nu = length(uext)
+
+  ### 1.- Parameter vectors and parameter matrix
+  # Construct the parameter vectors (using the already estimated p, sigma and tau values)
+  # that need to be applied to the corresponding y values based on scale j
+  # (in fact, from the l loop in the main part of the program we see that the hyperparameter values to be used
+  # for the calculation of K(u) for each y(l) depend on the scale j to which y(l) belongs)
+  # Note: the first 'p' in the name of the variables stands for "parameter".
+  ppV = rep(0, ny)
+  psV = rep(sigma, ny)
+  ptV = rep(0, ny)
+  for (j in 0:(y$nlevels-1)) {
+    cat("j:", j, "from:", 2^j, "to:", 2^(j+1)-1, "\n")
+    ppV[2^j:(2^(j+1)-1)] = rep(p[j+1], 2^j);
+    ptV[2^j:(2^(j+1)-1)] = rep(tau[j+1], 2^j);
+  }
+  paramsM = cbind(ppV, psV, ptV)
+
+  ### 2.- Compute f(y), h(y), p(y) needed for the calculation of K(u)
+  if (prior == "normal") {
+    aV = 1/(1 + (psV/ptV)^2);
+    bV = psV*sqrt(aV);
+    fyV = fyM(yvec, paramsM, prior, NULL);
+    pyV = ppV * dnorm(yvec, sd=ptV/sqrt(aV)) / fyV;
+    # Should be bound pyV by 1 from above? (taken from the cgf() function in bwtV12b.r)
+    #pyV = bound( ppV*dnorm(yvec, sd=ptV/sqrt(aV)) / fyV, 1, "min" );
+      ## The function min is to avoid the value of py going above 1 (which happened for extreme values of y!!)
+      ## And having py > 1 generates a negative value of 1 - py and possibly a negative value of mgf below
+      ## which is not possible (since the MGF must be non-negative).
+  }
+  else if (prior == "laplacian") {
+    # These are taken from the beginning of the cgf() function for the Laplacian prior case.
+    hyV = hyM(yvec, paramsM, prior);       # Dim = 127
+    fyV = fyM(yvec, paramsM, prior, hyV);  # Dim = 127
+    pyV = pmin( exp( log(0.5*ppV/ptV) + log(hyV) - log(fyV) + 0.5*(psV/ptV)^2 ), 1 );   # Dim = 127
+    constyV = pmin( exp(log(0.5*ppV/ptV) - log(fyV) + 0.5*(psV/ptV)^2), MAXDOUBLE );
+    #pyV = apply( cbind( exp( log(0.5*ppV/ptV) + log(hyV) - log(fyV) + 0.5*(psV/ptV)^2 ), 1 ), 1, min);   # Dim = 127
+    #constyV = apply( cbind( exp(log(0.5*ppV/ptV) - log(fyV) + 0.5*(psV/ptV)^2), MAXDOUBLE ), 1, min);
+    ## OJO: constyV takes the value MAXDOUBLE for some cases (4 cases for i = 1), which means that its value does not
+    ## take the correct value it should take... This may cause some computational problems...
+  }
+
+  ### 3.- Construct matrices to make the calculation in one go.
+  # Matrix of y repeated nu times as COLUMN vectors (NOT NEEDED)
+  #yM = matrix(yvec, nrow=ny, ncol=nu)
+  # Matrices for py and consty arranged by repeating the pyV and constyV vector along the columns
+  # These are needed to split them in the computation of K(u) which is done separately for
+  # indypsiuM_pos and indypsiuM_neg.
+  pyM = matrix(pyV, nrow=ny, ncol=nu)
+  constyM = matrix(constyV, nrow=ny, ncol=nu)
+
+  ### 4.- Loop over the different time points and compute K(u) for each time point
+  # Initialize K, K_der, K_der2
+  K = matrix(data=0, nrow=ny+1, ncol=nu); # There are ny+1 time points
+  K_der = K;
+  K_der2 = K;
+  for (i in 1:(ny+1)) {
+    psiV = psi[i,]  # Dim = 127 (= ny = length(yvec))
+    ## NOTE that this is not a particular wavelet. Instead it gives the contribution of all wavelets at all scales and locations to time point i.
+    ## Therefore, plotting this vector (as a function of l = 1 ... ny) will probably not give much of a sense...
+    ## This vector is used to multiply each value in vector u below
+
+    # Psi[i,] * u in matrix form
+    psiuM = psiV %*% t(uext);	# CHANGED-2013/06/05: Replaced u with uext in order to have a better estimate of the splines to K(u) using an extension of the u range to avoid border effects
+
+    # B(u)
+    y1uM = -(yvec/psV + psV/ptV*(1+psiuM*ptV)); # CHANGED-2013/06/05: Replaced yM with yvec, as it gives the same result
+    y2uM = -(yvec/psV - psV/ptV*(1-psiuM*ptV)); # CHANGED-2013/06/05: Replaced yM with yvec, as it gives the same result
+    argM = (psV^2*psiuM + yvec)/ptV 	# CHANGED-2013/06/05: Replaced yM with yvec as it will sum on all columns of psiuM, and therefore gives the same result as summing yM.
+    BM = exp(argM + log(pnorm(y1uM))) + exp(-argM + log(pnorm(-y2uM)));
+    # Check the values of BM
+    #summary(as.numeric(BM))
+    ## OK: min = 0, max = 0.67150, and at least 75% of cases are = 0
+
+    # y*psi*u
+    ypsiuM = yvec*psiuM
+    # Indices with positive and negative values of y*psi*u (the indices are LINEAR indices used to access the matrix elements)
+    # TODO: Could I change the index variables to LOGICAL? (for better performance)
+    indypsiuM_pos = which(ypsiuM>=0)
+    indypsiuM_neg = which(ypsiuM<0)
+
+    if (prior == "normal")
+    {
+      # Initialize KM for all indices (pos and neg) because this matrix is subsetted below to the positive and negative indices
+      KM = 0.5*(bV*psiuM)^2
+      # Compute a*y*psi*u for all indices (pos and neg)
+      aypsiuM = aV*ypsiuM
+      # Split the computation of KM for negative and positive y*psi*u values
+      argM = KM[indypsiuM_pos] + aypsiuM[indypsiuM_pos];
+      KM[indypsiuM_pos] = bound( argM + log( bound( (1-pyM[indypsiuM_pos])*exp(-argM) + pyM[indypsiuM_pos], MINDOUBLE, "max" ) ), MAXDOUBLE, "min" );
+      argM = KM[indypsiuM_neg];
+      KM[indypsiuM_neg] = bound( argM + log( bound( (1-pyM[indypsiuM_neg])*exp(-argM) + pyM[indypsiuM_neg]*exp(aypsiuM[indypsiuM_neg]), MINDOUBLE, "max" ) ), MAXDOUBLE, "min" );
+    }
+    else if (prior == "laplacian") {
+      # Initialize KM for all indices (pos and neg) because this matrix is subsetted below to the positive and negative indices
+      KM = 0.5*(psV*psiuM)^2
+      # Split the computation of KM for negative and positive y*psi*u values
+      KM[indypsiuM_pos] = KM[indypsiuM_pos] + ypsiuM[indypsiuM_pos] + log( (1-pyM[indypsiuM_pos])*exp(-KM[indypsiuM_pos] - ypsiuM[indypsiuM_pos]) + constyM[indypsiuM_pos]*BM[indypsiuM_pos] )
+      KM[indypsiuM_neg] = KM[indypsiuM_neg] + log( (1-pyM[indypsiuM_neg])*exp(-KM[indypsiuM_neg]) + constyM[indypsiuM_neg]*exp(ypsiuM[indypsiuM_neg])*BM[indypsiuM_neg] )
+    }
+
+    # Compute final K(u) for current time point i. This is a function of u that is the result of summing KM over all rows (u varies KM along the columns)
+    # This sum operation comes directly from the equation at the top of page 485 in the Biometrika paper, where the double sum shown there collapses
+    # to a single sum over the ny rows of KM.
+    K[i,] = apply(KM, 2, sum)   # Dim = 31 = nu
+
+    if (spline.fit) {
+      # Fit a spline for K(u) in order to check if it is concave
+      K_spline = smooth.spline(uext, K[i,]);
+      #    K_pspline = smooth.Pspline(uext, K[i,], norder=3);
+      # Estimate first derivative K_der
+      K_der_pred = predict(K_spline, uext, deriv=1);
+      #    K_der_ppred = predict(K_pspline, uext, nderiv=1);
+      K_der[i,] = K_der_pred$y;
+      # Fit a spline to the first derivative
+      K_der_spline = smooth.spline(uext, K_der[i,]);
+      #    K_der_pspline = smooth.Pspline(uext, K_der[i,], norder=3);
+      # Estimat seconde derivative K_der2
+      K_der2_pred = predict(K_der_spline, uext, deriv=1);
+      #    K_der2_ppred = predict(K_der_pspline, uext, nderiv=1);
+      K_der2[i,] = K_der2_pred$y;
+    }
+  }
+
+  # Restrict the values of K, K_der, K_der2 to the actual range of u
+  K = K[,uind]
+  K_der = K_der[,uind]
+  K_der2 = K_der2[,uind]
+
+  ### 5.- Initialize the matrices that will contain the median, and the lower and upper probability limits.
+  x_hat_med = vector("numeric", length=y$N);
+  x_hat_low = as.data.frame(matrix(nrow=y$N, ncol=3));
+  x_hat_upp = as.data.frame(matrix(nrow=y$N, ncol=3));
+  colnames(x_hat_low) = c("005", "025", "050");
+  colnames(x_hat_upp) = c("950", "975", "995");
+
+  # Saddlepoint approximation
+  cat("\tSaddlepoint approximation to the distribution of the signal given the wavelet coefficients...\n")
+  # Matrix of u repeated ny times as ROW vectors (used for the Saddlepoint approximation)
+  uM = matrix(u, nrow=ny+1, ncol=length(u), byrow=TRUE)     # There are ny+1 time points
+  v1 = sign(uM)*sqrt( bound(2*(uM*K_der - K), 0, "max") );
+  v2 = uM*sqrt( bound(K_der2, 0, "max") );
+  r = ifelse(v1==0, 0, v1 + 1/v1*log(v2/v1))  # Since 1/v1*log(v2/v1) -> 0 when v1 -> 0 set r to 0 when v1 -> 0
+  Fu = pnorm(r);
+  cat("Number of NA's in Fu:\n")
+  print(sum(is.na(Fu)))
+
+  ### Compute the lower and upper bounds of the CI for the signal
+  ### The method is based on the prediction of predefined quantiles (e.g. 5%, 50% and 95%) given by a smoothing spline
+  ### fitted to the points (r(u), K'(u)).
+  # Excluding NA's and Inf of r to avoid errors in the smoothing spline fit.
+#  ind_exclude = which(is.na(r) | abs(r) == Inf);
+#  if (length(ind_exclude) > 0)
+#  {
+#    rk.spline = try(smooth.spline(r[-ind_exclude], K_der[-ind_exclude]))#, df=spline.df.factor*length(r[i,-ind0])))
+#  }
+#  else
+#  {
+#    rk.spline = try(smooth.spline(r, K_der))#, df=spline.df.factor*length(r[i,])))
+#    ## Note that if I use the -ind_exclude notation as above when ind_exclude is empty, the vector r[-ind_exclude] is also EMPTY! Why? I don't know.
+#  }
+
+  # Iterate on each point and fit a smoothing spline on r[i,] and K_der[i,]
+  #op = par(mfrow=c(5,5), mar=c(0,0,0,0), oma=c(0,0,0,0), no.readonly=TRUE); on.exit(par(op))
+  for (i in 1:y$N) {
+    #plot(r[i,], K_der[i,], type="o", pch=21, bg="black")
+    rk.spline = try(smooth.spline(r[i,], K_der[i,]))#, df=spline.df.factor*length(r[i,])))
+    if (inherits(rk.spline, "try-error")) {
+      cat("ERROR: The smoothing spline could not be fit. The case will be skipped (i =", i, ")\n")
+    } else {
+      # (2011/11/05) The following numbers are the normal quantiles for 0.005, 0.025, 0.05, 0.5, 0.95, 0.975, 0.995
+      # and they were hardcoded in order to reduce computation time...
+      #            quantiles = predict(rk.spline, c(qnorm(0.005), qnorm(0.025), qnorm(0.05), 0, qnorm(0.95), qnorm(0.975), qnorm(0.995)))  # The 0 in the middle is qnorm(0.5)
+      q1 = -2.575829;		# quantile 0.005
+      q2 = -1.959964;		# quantile 0.025
+      q3 = -1.644854;		# quantile 0.05
+      q4 = 0;				    # quantile 0.5
+      q5 = 1.644854;		# quantile 0.95
+      q6 = 1.959964;		# quantile 0.975
+      q7 = 2.575829;		# quantile 0.995
+      quantiles = predict(rk.spline, c(q1, q2, q3, q4, q5, q6, q7))
+      x_hat_low[i, "005"] = quantiles$y[1]
+      x_hat_low[i, "025"] = quantiles$y[2]
+      x_hat_low[i, "050"] = quantiles$y[3]
+      x_hat_med[i] = quantiles$y[4]
+      x_hat_upp[i, "950"] = quantiles$y[5]
+      x_hat_upp[i, "975"] = quantiles$y[6]
+      x_hat_upp[i, "995"] = quantiles$y[7]
+    }
+  }
+
+  # Show the number of wrong cases (at most as many as time indices there are: N)
+#  cat("Number of cases with u*K'(u) - K(u) < 0:", wrong_count, ", smaller value:", wrong_min_value, "Summary:\n")
+#  print(summary(wrong_values))
+#  cat("Number of cases with K\"(u) < 0:", K_der2_neg_count, ", smaller value:", K_der2_min_value, "Summary: \n")
+#  print(summary(K_der2_neg_values))
+
+  #    list(x_hat_low=x_hat_low, x_hat_med=x_hat_med, x_hat_upp=x_hat_upp)
+  list(x_hat_low=x_hat_low, x_hat_med=x_hat_med, x_hat_upp=x_hat_upp, u=u, r=r, Fu=Fu, K=K, K_der=K_der, K_der2=K_der2)
 }
 #################################### PROBABILITY BANDS ########################################
 
